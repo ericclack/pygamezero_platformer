@@ -132,26 +132,26 @@ def wrap_around(mini, val, maxi):
 def almost_zero(v):
     return abs(v) <= 0.1
 
-def try_to_move(sprite, dx, dy):
-    # Recursive exit if both dx and dy are very small
+def move_as_far_as_we_can(sprite, dx, dy):
+    """Recursively try to move in direction dx,dy, then half that, and so on."""
+
+    # Stop trying (and recursion) if both dx and dy are very small
     if almost_zero(dx) and almost_zero(dy): return
 
     # Can we move in direction dx, dy?
     if '=' not in blocks_ahead_of(sprite, dx, dy):
-        # Which axis? Check for non-zero:
-        if dx: sprite.x += dx
-        else: sprite.y += dy
+        sprite.x += dx
+        sprite.y += dy
     else:
-        # Have another go with a smaller movement
-        try_to_move(sprite, dx/2, dy/2)
+        # Try again with a smaller movement
+        move_as_far_as_we_can(sprite, dx/2, dy/2)
 
 def move_ahead(sprite):
     # Record current pos so we can see if the sprite moved
     oldx, oldy = sprite.x, sprite.y
 
-    # In order to go in direction dx, dy there must be no wall that way
-    try_to_move(sprite, sprite.dx, 0)
-    try_to_move(sprite, 0, sprite.dy)
+    move_as_far_as_we_can(sprite, sprite.dx, 0)
+    move_as_far_as_we_can(sprite, 0, sprite.dy)
 
     # Keep sprite on the screen
     sprite.x = wrap_around(0, sprite.x, WIDTH-BLOCK_SIZE)
