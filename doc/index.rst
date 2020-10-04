@@ -55,3 +55,4 @@ Get in touch
 We would love to hear how you've got on with this tutorial or receive
 any other feedback. Get in touch with the author: |author|
  
+.. _Pac-Man tutorial: https://pygamezero-pacman.readthedocs.io/
