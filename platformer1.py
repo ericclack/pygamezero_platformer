@@ -111,7 +111,7 @@ def blocks_ahead_of(sprite, dx, dy):
 
     # Find integer block pos, using floor (so 4.7 becomes 4)
     ix,iy = int(x // BLOCK_SIZE), int(y // BLOCK_SIZE)
-    # Remainder let's us check adjacent blocks
+    # Remainder lets us check adjacent blocks
     rx, ry = x % BLOCK_SIZE, y % BLOCK_SIZE
     # Keep in bounds of world
     if ix == WORLD_SIZE-1: rx = 0
@@ -129,15 +129,29 @@ def wrap_around(mini, val, maxi):
     elif val > maxi: return mini
     else: return val
 
+def almost_zero(v):
+    return abs(v) <= 0.1
+
+def try_to_move(sprite, dx, dy):
+    # Recursive exit if both dx and dy are very small
+    if almost_zero(dx) and almost_zero(dy): return
+
+    # Can we move in direction dx, dy?
+    if '=' not in blocks_ahead_of(sprite, dx, dy):
+        # Which axis? Check for non-zero:
+        if dx: sprite.x += dx
+        else: sprite.y += dy
+    else:
+        # Have another go with a smaller movement
+        try_to_move(sprite, dx/2, dy/2)
+
 def move_ahead(sprite):
     # Record current pos so we can see if the sprite moved
     oldx, oldy = sprite.x, sprite.y
 
     # In order to go in direction dx, dy there must be no wall that way
-    if '=' not in blocks_ahead_of(sprite, sprite.dx, 0):
-        sprite.x += sprite.dx
-    if '=' not in blocks_ahead_of(sprite, 0, sprite.dy):
-        sprite.y += sprite.dy
+    try_to_move(sprite, sprite.dx, 0)
+    try_to_move(sprite, 0, sprite.dy)
 
     # Keep sprite on the screen
     sprite.x = wrap_around(0, sprite.x, WIDTH-BLOCK_SIZE)
