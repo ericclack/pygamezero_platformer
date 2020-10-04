@@ -18,7 +18,7 @@ Test this out and check everything works.
 Let's add some gravity!
 -----------------------
 
-Find the :code:`update` function (it's around line 200) and add this
+Find the :code:`update` function (it's around line 190) and add this
 line right at the start of the function:
 
 .. code:: python
@@ -29,7 +29,7 @@ With this one simple change we now have a platformer! Well sort of...
 This code will cause our character to fall if there is no block
 underneath him or her. Go and try it. You might see some problems:
 
- 1. Your world is designed for Pac-Man not a platformer, so it doesn't work very well
+ 1. Your world is designed for Pac-Man not a platformer, so it doesn't work very well and there are too many ghosts!
  2. Our character falls very fast for long drops
  3. Sometimes our character can't get through small gaps.
 
