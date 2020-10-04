@@ -150,6 +150,7 @@ def move_ahead(sprite):
     # Record current pos so we can see if the sprite moved
     oldx, oldy = sprite.x, sprite.y
 
+    # By checking x, then y, we can more easily get through gaps
     move_as_far_as_we_can(sprite, sprite.dx, 0)
     move_as_far_as_we_can(sprite, 0, sprite.dy)
 
