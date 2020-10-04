@@ -129,6 +129,32 @@ def wrap_around(mini, val, maxi):
     elif val > maxi: return mini
     else: return val
 
+def max_move_sprite(sprite, delta, test_offset, move_axis, static_axis, is_obstructed):
+    # This function is generalized to wo
+    # pos_1, pos_2  are the coordinates of the point being tested.  To make sense of this
+    # code think of pos_1,pos_2 being x,y coordinates.  But actually they might be y,x
+    # coordinates depending on the value of move_axis and static_axis.
+
+    # Comments below are written for the case of x,y i.e. move_axis = 0, static_axis = 1
+    # and the player is moving left to right
+
+    #
+    if (delta > 0):
+        pos_1 = getattr(sprite,move_axis) + SPRITE_SIZE + delta + 0.5
+    else:
+        pos_1 = getattr(sprite,move_axis) + delta - 0.5
+
+    pos_2 = getattr(sprite, static_axis) + test_offset
+
+    posi_1,posi_2 = int(pos_1 // BLOCK_SIZE), int(pos_2 // BLOCK_SIZE)
+    r1, r2 = pos_1 % BLOCK_SIZE, pos_2 % BLOCK_SIZE
+    if (is_obstructed(posi_1,posi_2)):
+        if  (delta > 0):
+            delta -= r1
+        else:
+            delta += (BLOCK_SIZE - r1)
+    return delta
+
 def move_ahead(sprite):
     # Record current pos so we can see if the sprite moved
     oldx, oldy = sprite.x, sprite.y
