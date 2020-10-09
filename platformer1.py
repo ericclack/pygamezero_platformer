@@ -133,18 +133,35 @@ def almost_zero(v):
     return abs(v) <= 0.1
 
 def move_as_far_as_we_can(sprite, dx, dy):
-    """Recursively try to move in direction dx,dy, then half that, and so on."""
+    """Kove by dx,dy and if blocked move as far as we can."""
 
-    # Stop trying (and recursion) if both dx and dy are very small
-    if almost_zero(dx) and almost_zero(dy): return
+    # This only works for small-ish movements
+    assert( abs(dx) < BLOCK_SIZE and abs(dy) < BLOCK_SIZE )
 
     # Can we move in direction dx, dy?
     if '=' not in blocks_ahead_of(sprite, dx, dy):
         sprite.x += dx
         sprite.y += dy
     else:
-        # Try again with a smaller movement
-        move_as_far_as_we_can(sprite, dx/2, dy/2)
+        # Move as far as the edge of the block we are moving towards
+        rx = int(round(sprite.left)) % BLOCK_SIZE
+        ry = int(round(sprite.top)) % BLOCK_SIZE
+        if dx:
+            if rx == 0:
+                gap = 0
+            elif dx > 0:
+                gap = BLOCK_SIZE - rx
+            else:
+                gap = -rx
+            sprite.x += gap
+        if dy:
+            if ry == 0:
+                gap = 0
+            elif dy > 0:
+                gap = BLOCK_SIZE - ry
+            else:
+                gap = -ry
+            sprite.y += gap
 
 def move_ahead(sprite):
     # Record current pos so we can see if the sprite moved
@@ -213,7 +230,7 @@ def update():
     if pacman.food_left == 0:
         next_level()
 
-    for g in ghosts:
+    for g in []: #ghosts:
         if not move_ahead(g):
             new_ghost_direction(g)
         if g.colliderect(pacman):
