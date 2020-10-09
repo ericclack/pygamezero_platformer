@@ -5,6 +5,7 @@ TEST_MODE = True
 
 WORLD_SIZE = 20
 BLOCK_SIZE = 32
+SPRITE_SIZE = 32
 WIDTH = WORLD_SIZE*BLOCK_SIZE
 HEIGHT = WORLD_SIZE*BLOCK_SIZE
 
@@ -140,9 +141,9 @@ def max_move_sprite(sprite, delta, test_offset, move_axis, static_axis, is_obstr
 
     #
     if (delta > 0):
-        pos_1 = getattr(sprite,move_axis) + SPRITE_SIZE + delta + 0.5
+        pos_1 = getattr(sprite, move_axis) + SPRITE_SIZE + delta + 0.5
     else:
-        pos_1 = getattr(sprite,move_axis) + delta - 0.5
+        pos_1 = getattr(sprite, move_axis) + delta - 0.5
 
     pos_2 = getattr(sprite, static_axis) + test_offset
 
@@ -155,15 +156,25 @@ def max_move_sprite(sprite, delta, test_offset, move_axis, static_axis, is_obstr
             delta += (BLOCK_SIZE - r1)
     return delta
 
+def minabs(a,b):
+    if abs(a) < abs(b): return a
+    else: return b
+
+def move_sprite(sprite, dx, dy):
+    # For movement on x axis check top and bottom of sprite
+    max_dx = minabs( max_move_sprite(sprite, dx, 0  , "x", "y", lambda x,y:(world[y][x] == '=')),
+                     max_move_sprite(sprite, dx, SPRITE_SIZE, "x", "y", lambda x,y:(world[y][x] == '=')))
+    sprite.x += max_dx
+
+    max_dy = minabs( max_move_sprite(sprite, dy, 0,           "y", "x", lambda y,x:(world[y][x] == '=')),
+                     max_move_sprite(sprite, dy, SPRITE_SIZE, "y", "x", lambda y,x:(world[y][x] == '=')))
+    sprite.y += max_dy
+
 def move_ahead(sprite):
     # Record current pos so we can see if the sprite moved
     oldx, oldy = sprite.x, sprite.y
 
-    # In order to go in direction dx, dy there must be no wall that way
-    if '=' not in blocks_ahead_of(sprite, sprite.dx, 0):
-        sprite.x += sprite.dx
-    if '=' not in blocks_ahead_of(sprite, 0, sprite.dy):
-        sprite.y += sprite.dy
+    move_sprite(sprite, sprite.dx, sprite.dy)
 
     # Keep sprite on the screen
     sprite.x = wrap_around(0, sprite.x, WIDTH-BLOCK_SIZE)
