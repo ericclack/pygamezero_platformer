@@ -129,9 +129,6 @@ def wrap_around(mini, val, maxi):
     elif val > maxi: return mini
     else: return val
 
-def almost_zero(v):
-    return abs(v) <= 0.1
-
 def move_as_far_as_we_can(sprite, dx, dy):
     """Kove by dx,dy and if blocked move as far as we can."""
 
@@ -159,7 +156,7 @@ def move_ahead(sprite):
     # Record current pos so we can see if the sprite moved
     oldx, oldy = sprite.x, sprite.y
 
-    # By checking x, then y, we can more easily get through gaps
+    # By moving x, then y, we can more easily get through gaps
     move_as_far_as_we_can(sprite, sprite.dx, 0)
     move_as_far_as_we_can(sprite, 0, sprite.dy)
 
