@@ -222,7 +222,7 @@ def update():
     if pacman.food_left == 0:
         next_level()
 
-    for g in []: #ghosts:
+    for g in ghosts:
         if not move_ahead(g):
             new_ghost_direction(g)
         if g.colliderect(pacman):
