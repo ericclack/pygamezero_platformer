@@ -50,6 +50,7 @@ char_to_image = {
     'G': 'ghost3.png',
     'h': 'ghost4.png',
     'H': 'ghost5.png',
+    '|': 'ladder.png',
 }
 
 def load_level(number):
@@ -177,14 +178,17 @@ def move_ahead(sprite):
         sprite.angle = a
     return moved
 
-def eat_food():
+def touching_block(sprite, block, remove_it=False):
     ix,iy = int(pacman.x / BLOCK_SIZE), int(pacman.y / BLOCK_SIZE)
-    if world[iy][ix] == '.':
-        world[iy][ix] = None
+    touching = world[iy][ix] == block
+    if touching and remove_it: world[iy][ix] = None
+    return touching
+
+def eat_food():
+    if touching_block(pacman, '.', True):
         pacman.food_left -= 1
         pacman.score += 1
-    elif world[iy][ix] == '*':
-        world[iy][ix] = None
+    elif touching_block(pacman, '*', True):
         pacman.powerup = POWER_UP_START
         set_banner("Power Up!", 5)
         for g in ghosts: new_ghost_direction(g)
@@ -211,7 +215,8 @@ def next_level():
 
 def update():
     # Gravity
-    pacman.dy = min(SPEED, pacman.dy + 0.1)
+    if not touching_block(pacman, '|'):
+        pacman.dy = min(SPEED, pacman.dy + 0.1)
 
     # Regular movement
     move_ahead(pacman)
