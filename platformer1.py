@@ -8,8 +8,9 @@ BLOCK_SIZE = 32
 WIDTH = WORLD_SIZE*BLOCK_SIZE
 HEIGHT = WORLD_SIZE*BLOCK_SIZE
 
-SPEED = 4
-GHOST_SPEED = 2
+SPEED = 2
+JUMP_SPEED = 4
+GHOST_SPEED = 1
 POWER_UP_START = 25
 
 # An array containing the world tiles
@@ -266,7 +267,7 @@ def on_key_down(key):
         pacman.dx = SPEED
     if key == keys.UP and standing_on_block(pacman, ['=', '|']):
         # Jump
-        pacman.dy = -SPEED
+        pacman.dy = -JUMP_SPEED
     if key == keys.DOWN:
         pacman.dy = SPEED
 
