@@ -143,25 +143,17 @@ def move_as_far_as_we_can(sprite, dx, dy):
         sprite.x += dx
         sprite.y += dy
     else:
-        # Move as far as the edge of the block we are moving towards
-        rx = int(round(sprite.left)) % BLOCK_SIZE
-        ry = int(round(sprite.top)) % BLOCK_SIZE
-        if dx:
-            if rx == 0:
-                gap = 0
-            elif dx > 0:
-                gap = BLOCK_SIZE - rx
-            else:
-                gap = -rx
-            sprite.x += gap
-        if dy:
-            if ry == 0:
-                gap = 0
-            elif dy > 0:
-                gap = BLOCK_SIZE - ry
-            else:
-                gap = -ry
-            sprite.y += gap
+        # There's a block in the way!
+        # Move as far as the edge of the block
+
+        def pixels_to_edge_of_block(current_pos, direction):
+            r = int(round(current_pos)) % BLOCK_SIZE
+            if r == 0: return 0
+            elif direction > 0: return BLOCK_SIZE - r
+            else: return -r
+
+        if dx: sprite.x += pixels_to_edge_of_block(sprite.left, dx)
+        if dy: sprite.y += pixels_to_edge_of_block(sprite.top, dy)
 
 def move_ahead(sprite):
     # Record current pos so we can see if the sprite moved
