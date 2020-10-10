@@ -184,6 +184,14 @@ def touching_block(sprite, block, remove_it=False):
     if touching and remove_it: world[iy][ix] = None
     return touching
 
+def standing_on_block(sprite, blocks):
+    ix,iy = int(pacman.x / BLOCK_SIZE), int(pacman.y / BLOCK_SIZE)
+    blocks_below = blocks_ahead_of(sprite, 0, 1)
+    for b in blocks:
+        if b in blocks_below:
+            return True
+    return False
+
 def eat_food():
     if touching_block(pacman, '.', True):
         pacman.food_left -= 1
@@ -214,7 +222,7 @@ def next_level():
     reset_sprites()
 
 def update():
-    # Gravity
+    # Gravity, if we're not on a ladder
     if not touching_block(pacman, '|'):
         pacman.dy = min(SPEED, pacman.dy + 0.1)
 
@@ -256,7 +264,8 @@ def on_key_down(key):
         pacman.dx = -SPEED
     if key == keys.RIGHT:
         pacman.dx = SPEED
-    if key == keys.UP:
+    if key == keys.UP and standing_on_block(pacman, ['=', '|']):
+        # Jump
         pacman.dy = -SPEED
     if key == keys.DOWN:
         pacman.dy = SPEED
