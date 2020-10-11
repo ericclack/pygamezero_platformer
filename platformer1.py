@@ -131,7 +131,7 @@ def wrap_around(mini, val, maxi):
     elif val > maxi: return mini
     else: return val
 
-def move_as_far_as_we_can(sprite, dx, dy, bounce=False):
+def move_as_far_as_we_can(sprite, dx, dy):
     """Kove by dx,dy and if blocked move as far as we can."""
 
     # This only works for small-ish movements
@@ -154,17 +154,17 @@ def move_as_far_as_we_can(sprite, dx, dy, bounce=False):
         if dx: sprite.x += pixels_to_edge_of_block(sprite.left, dx)
         if dy: sprite.y += pixels_to_edge_of_block(sprite.top, dy)
 
-        if bounce:
-            if dx: sprite.dx = -dx/3
+        # Bounce off a ceiling for more realistic jumping
+        if sprite == pacman and dy < 0:
             if dy: sprite.dy = -dy/3
 
-def move_sprite(sprite, bounce=False):
+def move_sprite(sprite):
     # Record current pos so we can see if the sprite moved
     oldx, oldy = sprite.x, sprite.y
 
     # By moving x, then y, we can more easily get through gaps
-    move_as_far_as_we_can(sprite, sprite.dx, 0, bounce)
-    move_as_far_as_we_can(sprite, 0, sprite.dy, bounce)
+    move_as_far_as_we_can(sprite, sprite.dx, 0)
+    move_as_far_as_we_can(sprite, 0, sprite.dy)
 
     # Keep sprite on the screen
     sprite.x = wrap_around(0, sprite.x, WIDTH-BLOCK_SIZE)
@@ -232,7 +232,7 @@ def update():
         pacman.dy = min(SPEED, pacman.dy + 0.1)
 
     # Regular movement
-    move_sprite(pacman, bounce=True)
+    move_sprite(pacman)
     eat_food()
     if pacman.food_left == 0:
         next_level()
