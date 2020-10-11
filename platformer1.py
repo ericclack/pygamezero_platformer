@@ -21,6 +21,7 @@ pacman = Actor('pacman_o.png')
 pacman.x = pacman.y = 1.5*BLOCK_SIZE
 # Direction that we're going in
 pacman.dx, pacman.dy = 0,0
+pacman.moving_x = pacman.moving_y = 0
 # Other game variables
 pacman.food_left = None
 pacman.level = 1
@@ -73,6 +74,7 @@ def new_ghost_direction(g):
     else:
         g.dx = random.choice([-GHOST_SPEED, GHOST_SPEED])
         g.dy = random.choice([-GHOST_SPEED, GHOST_SPEED])
+    g.moving_x = g.moving_y = 0
 
 def make_ghost_actors():
     for y, row in enumerate(world):
@@ -124,6 +126,8 @@ def blocks_ahead_of(sprite, dx, dy):
     if ry: blocks.append(world[iy+1][ix])
     if rx and ry: blocks.append(world[iy+1][ix+1])
 
+    if sprite==pacman: print((rx, ry))
+
     return blocks
 
 def wrap_around(mini, val, maxi):
@@ -155,7 +159,7 @@ def move_as_far_as_we_can(sprite, dx, dy):
         if dy: sprite.y += pixels_to_edge_of_block(sprite.top, dy)
 
         # Bounce off a ceiling for more realistic jumping
-        if sprite == pacman and dy < 0:
+        if sprite == pacman and sprite.moving_y and dy < 0:
             if dy: sprite.dy = -dy/3
 
 def move_sprite(sprite):
@@ -171,7 +175,9 @@ def move_sprite(sprite):
     sprite.y = wrap_around(0, sprite.y, HEIGHT-BLOCK_SIZE)
 
     # Did we move?
-    moved = (oldx != sprite.x or oldy != sprite.y)
+    sprite.moving_y = oldy != sprite.y
+    sprite.moving_x = oldx != sprite.x
+    moved = sprite.moving_x or sprite.moving_y
 
     # Costume change for pacman
     if moved and sprite == pacman:
