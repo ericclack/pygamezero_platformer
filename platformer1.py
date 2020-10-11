@@ -131,7 +131,7 @@ def wrap_around(mini, val, maxi):
     elif val > maxi: return mini
     else: return val
 
-def move_as_far_as_we_can(sprite, dx, dy):
+def move_as_far_as_we_can(sprite, dx, dy, bounce=False):
     """Kove by dx,dy and if blocked move as far as we can."""
 
     # This only works for small-ish movements
@@ -154,13 +154,17 @@ def move_as_far_as_we_can(sprite, dx, dy):
         if dx: sprite.x += pixels_to_edge_of_block(sprite.left, dx)
         if dy: sprite.y += pixels_to_edge_of_block(sprite.top, dy)
 
-def move_ahead(sprite):
+        if bounce:
+            if dx: sprite.dx = -dx/3
+            if dy: sprite.dy = -dy/3
+
+def move_sprite(sprite, bounce=False):
     # Record current pos so we can see if the sprite moved
     oldx, oldy = sprite.x, sprite.y
 
     # By moving x, then y, we can more easily get through gaps
-    move_as_far_as_we_can(sprite, sprite.dx, 0)
-    move_as_far_as_we_can(sprite, 0, sprite.dy)
+    move_as_far_as_we_can(sprite, sprite.dx, 0, bounce)
+    move_as_far_as_we_can(sprite, 0, sprite.dy, bounce)
 
     # Keep sprite on the screen
     sprite.x = wrap_around(0, sprite.x, WIDTH-BLOCK_SIZE)
@@ -228,13 +232,13 @@ def update():
         pacman.dy = min(SPEED, pacman.dy + 0.1)
 
     # Regular movement
-    move_ahead(pacman)
+    move_sprite(pacman, bounce=True)
     eat_food()
     if pacman.food_left == 0:
         next_level()
 
     for g in ghosts:
-        if not move_ahead(g):
+        if not move_sprite(g):
             new_ghost_direction(g)
         if g.colliderect(pacman):
             if pacman.powerup:
