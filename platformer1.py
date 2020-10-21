@@ -120,15 +120,15 @@ def blocks_ahead_of(sprite, dx, dy):
     # sprite size
     rx = (x % BLOCK_SIZE) - (BLOCK_SIZE - sprite.width)
     ry = (y % BLOCK_SIZE) - (BLOCK_SIZE - sprite.height)
-    if sprite == pacman: print((rx,ry))
+
     # Keep in bounds of world
     if ix == WORLD_SIZE-1: rx = 0
     if iy == WORLD_SIZE-1: ry = 0
 
     blocks = [ world[iy][ix] ]
-    if rx: blocks.append(world[iy][ix+1])
-    if ry: blocks.append(world[iy+1][ix])
-    if rx and ry: blocks.append(world[iy+1][ix+1])
+    if rx > 0: blocks.append(world[iy][ix+1])
+    if ry > 0: blocks.append(world[iy+1][ix])
+    if rx > 0 and ry > 0: blocks.append(world[iy+1][ix+1])
 
     return blocks
 
