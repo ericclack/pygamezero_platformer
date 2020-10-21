@@ -16,6 +16,9 @@ POWER_UP_START = 25
 # An array containing the world tiles
 world = []
 
+# What keys are currently pressed down?
+keys_down = {}
+
 # Our sprites
 pacman = Actor('sm_pacman_o.png')
 print((pacman.width, pacman.height))
@@ -228,6 +231,21 @@ def update():
     if not touching_block(pacman, '|'):
         pacman.dy = min(SPEED, pacman.dy + 0.1)
 
+    # Keys control pacman
+    if keys.LEFT in keys_down:
+        pacman.dx = -SPEED
+    elif keys.RIGHT in keys_down:
+        pacman.dx = SPEED
+    else:
+        # Slow down as no key pressed
+        pacman.dx *= 0.7
+
+    if keys.UP in keys_down and standing_on_block(pacman, ['=', '|']):
+        # Jump
+        pacman.dy = -JUMP_SPEED
+    if keys.DOWN in keys_down:
+        pacman.dy = SPEED
+
     # Regular movement
     move_sprite(pacman)
     eat_food()
@@ -251,10 +269,7 @@ def update():
                 reset_sprites()
 
 def on_key_up(key):
-    if key in (keys.LEFT, keys.RIGHT):
-        pacman.dx = 0
-    if key in (keys.UP, keys.DOWN):
-        pacman.dy = 0
+    if key in keys_down: del(keys_down[key])
 
     if TEST_MODE:
         # Put special key commands here
@@ -262,15 +277,7 @@ def on_key_up(key):
             next_level()
 
 def on_key_down(key):
-    if key == keys.LEFT:
-        pacman.dx = -SPEED
-    if key == keys.RIGHT:
-        pacman.dx = SPEED
-    if key == keys.UP and standing_on_block(pacman, ['=', '|']):
-        # Jump
-        pacman.dy = -JUMP_SPEED
-    if key == keys.DOWN:
-        pacman.dy = SPEED
+    keys_down[key] = True
 
 def alternate(value, option1, option2):
     if value == option1: return option2
