@@ -17,7 +17,8 @@ POWER_UP_START = 25
 world = []
 
 # Our sprites
-pacman = Actor('pacman_o.png')
+pacman = Actor('sm_pacman_o.png')
+print((pacman.width, pacman.height))
 pacman.x = pacman.y = 1.5*BLOCK_SIZE
 # Direction that we're going in
 pacman.dx, pacman.dy = 0,0
@@ -115,8 +116,11 @@ def blocks_ahead_of(sprite, dx, dy):
 
     # Find integer block pos, using floor (so 4.7 becomes 4)
     ix,iy = int(x // BLOCK_SIZE), int(y // BLOCK_SIZE)
-    # Remainder lets us check adjacent blocks
-    rx, ry = x % BLOCK_SIZE, y % BLOCK_SIZE
+    # Remainder lets us check adjacent blocks, adjust for
+    # sprite size
+    rx = (x % BLOCK_SIZE) - (BLOCK_SIZE - sprite.width)
+    ry = (y % BLOCK_SIZE) - (BLOCK_SIZE - sprite.height)
+    if sprite == pacman: print((rx,ry))
     # Keep in bounds of world
     if ix == WORLD_SIZE-1: rx = 0
     if iy == WORLD_SIZE-1: ry = 0
@@ -126,8 +130,6 @@ def blocks_ahead_of(sprite, dx, dy):
     if ry: blocks.append(world[iy+1][ix])
     if rx and ry: blocks.append(world[iy+1][ix+1])
 
-    if sprite==pacman: print((rx, ry))
-
     return blocks
 
 def wrap_around(mini, val, maxi):
@@ -135,8 +137,8 @@ def wrap_around(mini, val, maxi):
     elif val > maxi: return mini
     else: return val
 
-def move_as_far_as_we_can(sprite, dx, dy):
-    """Kove by dx,dy and if blocked move as far as we can."""
+def move_or_bounce(sprite, dx, dy):
+    """Move by dx,dy and if blocked move as far as we can."""
 
     # This only works for small-ish movements
     assert( abs(dx) < BLOCK_SIZE and abs(dy) < BLOCK_SIZE )
@@ -146,20 +148,9 @@ def move_as_far_as_we_can(sprite, dx, dy):
         sprite.x += dx
         sprite.y += dy
     else:
-        # There's a block in the way!
-        # Move as far as the edge of the block
-
-        def pixels_to_edge_of_block(current_pos, direction):
-            r = int(round(current_pos)) % BLOCK_SIZE
-            if r == 0: return 0
-            elif direction > 0: return BLOCK_SIZE - r
-            else: return -r
-
-        if dx: sprite.x += pixels_to_edge_of_block(sprite.left, dx)
-        if dy: sprite.y += pixels_to_edge_of_block(sprite.top, dy)
-
-        # Bounce off a ceiling for more realistic jumping
-        if sprite == pacman and sprite.moving_y and dy < 0:
+        # Bounce off things
+        if sprite == pacman:
+            if dx: sprite.dx = -dx/3
             if dy: sprite.dy = -dy/3
 
 def move_sprite(sprite):
@@ -167,8 +158,8 @@ def move_sprite(sprite):
     oldx, oldy = sprite.x, sprite.y
 
     # By moving x, then y, we can more easily get through gaps
-    move_as_far_as_we_can(sprite, sprite.dx, 0)
-    move_as_far_as_we_can(sprite, 0, sprite.dy)
+    move_or_bounce(sprite, sprite.dx, 0)
+    move_or_bounce(sprite, 0, sprite.dy)
 
     # Keep sprite on the screen
     sprite.x = wrap_around(0, sprite.x, WIDTH-BLOCK_SIZE)
