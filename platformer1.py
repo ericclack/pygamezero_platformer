@@ -21,6 +21,7 @@ keys_down = {}
 
 # Our sprites
 pacman = Actor('sm_pacman_o.png')
+
 print((pacman.width, pacman.height))
 pacman.x = pacman.y = 1.5*BLOCK_SIZE
 # Direction that we're going in
@@ -52,6 +53,7 @@ char_to_image = {
     '.': 'dot.png',
     '=': 'wall.png',
     '*': 'power.png',
+    'f': 'fire.png',
     'g': 'ghost1.png',
     'G': 'ghost3.png',
     'h': 'ghost4.png',
@@ -267,6 +269,9 @@ def update():
                 else:
                     set_banner("Game Over", 25)
                 reset_sprites()
+
+    if 'f' in blocks_ahead_of(pacman, 0, 0):
+        set_banner("Lava!", 5)
 
 def on_key_up(key):
     if key in keys_down: del(keys_down[key])
